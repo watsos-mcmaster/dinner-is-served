@@ -38,16 +38,16 @@ function ShoppingCart({items}) {
         return (
           <Grid item key={i}>
             <Paper className={classes.paper}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={4}>
+              <Grid container spacing={2} alignItems="center" justify="space-between">
+                <Grid item>
                   <Typography variant="h4" style={{ fontWeight: 600 }}>{item.name}</Typography>
                   <Typography variant="h5" color="textSecondary">${item.price}</Typography>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item>
                   <Typography variant="h6" className={classes.title}>
                     Selected options:
                   </Typography>
-                  <List>
+                  <List dense>
                     {item.options.length === 0 && <ListItem><Typography color="textSecondary">N/A</Typography></ListItem>}
                     {item.options.map((option, i) => {
                       return (
@@ -67,10 +67,10 @@ function ShoppingCart({items}) {
         )
       })}
       <Grid container direction="column" alignItems="flex-end">
-        <Grid item xs={3}>
+        <Grid item xs={4}>
           <Typography variant="h5">Total price: ${sumPrices()}</Typography>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={4}>
           <Button variant="contained" color="primary" disabled={items.length===0} onClick={handleFinalize}>Finalize Purchase</Button>
         </Grid>
       </Grid>
