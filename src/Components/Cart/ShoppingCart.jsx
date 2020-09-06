@@ -1,9 +1,10 @@
 import React from 'react'
-import { connect, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Grid, Paper, Typography, List, ListItem, Button, makeStyles } from '@material-ui/core';
 import HighlightOffOutlinedIcon from '@material-ui/icons/HighlightOffOutlined';
-import { removeFromCart, completePurchase } from '../../redux/actions';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+import { removeFromCart, completePurchase, setCurrentItem, setCartIndex } from '../../redux/actions';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -13,13 +14,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ShoppingCart({items}) {
+export default function ShoppingCart() {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const items = useSelector(state => state.reducer.cart);
   const history = useHistory();
 
   function handleClick(index) {
     dispatch(removeFromCart(index));
+  }
+
+  function handleEdit(index) {
+    dispatch(setCartIndex(index));
+    dispatch(setCurrentItem(items[index].name, items[index].price, items[index].options));
+    history.push(`/item/${items[index].name.toLowerCase()}`);
   }
 
   function handleFinalize() {
@@ -58,8 +66,13 @@ function ShoppingCart({items}) {
                     })}
                   </List>
                 </Grid>
-                <Grid item>
-                  <Button variant="contained" color="primary" onClick={() => handleClick(i)}><HighlightOffOutlinedIcon/> Remove Item</Button>
+                <Grid item container xs={4} spacing={2}>
+                  <Grid item xs={12}>
+                    <Button variant="contained" color="primary" onClick={() => handleEdit(i)} startIcon={<EditOutlinedIcon/>} fullWidth> Edit Item</Button>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button variant="contained" color="primary" onClick={() => handleClick(i)} startIcon={<HighlightOffOutlinedIcon/>} fullWidth> Remove Item</Button>
+                  </Grid>
                 </Grid>
               </Grid>
             </Paper>
@@ -77,13 +90,3 @@ function ShoppingCart({items}) {
     </Grid>
   )
 }
-
-function mapStateToProps(state) {
-  return {
-    items: state.reducer.cart
-  }
-}
-
-export default connect(
-  mapStateToProps
-)(ShoppingCart)

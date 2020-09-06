@@ -1,14 +1,17 @@
 import React, { useState } from 'react'
 import { Grid, FormGroup, Checkbox, FormControl, FormControlLabel, Typography, RadioGroup, Radio } from '@material-ui/core'
-import { connect, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { OutlinedDiv } from '../../Styles';
 import * as Actions from '../../../redux/actions';
 
-function FoodItem({itemName, price, options}) {
+export default function FoodItem({itemName, price, options}) {
     const dispatch = useDispatch();
+    const currentOptions = useSelector(state => state.reducer.currentItem.options);
 
     React.useEffect(() => {
-        dispatch(Actions.setCurrentItem(itemName, price));
+        if (currentOptions.length === 0) {
+            dispatch(Actions.setCurrentItem(itemName, price));
+        }
 
         return () => {
             dispatch(Actions.resetCurrentItem);
@@ -36,10 +39,10 @@ function FoodItem({itemName, price, options}) {
                                 {item.type === "multi"
                                 ? <FormGroup>
                                     {item.options.map((option, i) => {
-                                        return <SelectableItem name={option} key={i} handleChange={handleMultiChange}/>
+                                        return <SelectableItem name={option} key={i} handleChange={handleMultiChange} currentOptions={currentOptions}/>
                                     })}
                                 </FormGroup>
-                                : <SingleGroup items={item.options}/>}
+                                : <SingleGroup items={item.options} currentOptions={currentOptions}/>}
                             </FormControl>
                         </Grid>
                     )
@@ -49,17 +52,21 @@ function FoodItem({itemName, price, options}) {
     );
 }
 
-function SingleGroup({items}) {
+function SingleGroup({items, currentOptions}) {
     const dispatch = useDispatch();
-    const [value, setValue] = useState(items[0]);
-    const previousValue = React.useRef("");
+    const selectedOption = currentOptions.map(option => items.indexOf(option)).find(index => index > -1);
+    const [value, setValue] = useState(selectedOption ? items[selectedOption] : items[0]);
+    const [previousValue, setPreviousValue] = useState("");
     
     React.useEffect(() => {
-        if ( previousValue ) {
-            dispatch(Actions.toggleItemOption(previousValue.current));
+        const previousIndex = currentOptions.indexOf(previousValue);
+        if ( previousValue && previousIndex > -1) {
+            dispatch(Actions.toggleItemOption(previousValue));
         }
-        dispatch(Actions.toggleItemOption(value));
-        previousValue.current = value;
+        if ( previousValue || selectedOption === undefined) {
+            dispatch(Actions.toggleItemOption(value));
+        }
+        setPreviousValue(value);
     }, [value])
 
     return (
@@ -71,21 +78,11 @@ function SingleGroup({items}) {
     )
 }
 
-function SelectableItem({name, handleChange}) {
+function SelectableItem({name, handleChange, currentOptions}) {
     return (
         <FormControlLabel
-            control={<Checkbox color="primary" onChange={handleChange} name={name} />}
+            control={<Checkbox color="primary" checked={currentOptions.indexOf(name) > -1} onChange={handleChange} name={name} />}
             label={name}
         />
     )
 }
-
-function mapStateToProps(state) {
-    return {
-        currentItem: state.reducer.currentItem
-    }
-}
-
-export default connect(
-    mapStateToProps
-)(FoodItem)

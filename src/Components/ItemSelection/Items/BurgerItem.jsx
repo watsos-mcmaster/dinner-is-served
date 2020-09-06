@@ -29,6 +29,6 @@ const burgerSelections = [
 
 export default function BurgerItem() {
     return (
-        <FoodItem itemName="Burger" price={11} options={burgerSelections}/>
+        <FoodItem itemName="Hamburger" price={11} options={burgerSelections}/>
     )
 }

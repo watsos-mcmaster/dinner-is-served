@@ -3,8 +3,8 @@ import { Switch, Route, useHistory } from 'react-router-dom';
 import { Grid, Typography, Button } from '@material-ui/core';
 import SaladItem from './Items/SaladItem';
 import SmoothieItem from './Items/SmoothieItem';
-import { useDispatch } from 'react-redux';
-import { addToCart } from '../../redux/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart, updateCartItem } from '../../redux/actions';
 import BurgerItem from './Items/BurgerItem';
 import PizzaItem from './Items/PizzaItem';
 import ChickenItem from './Items/ChickenItem';
@@ -17,10 +17,16 @@ import CakeItem from './Items/CakeItem';
 export default function ItemContainer() {
     const dispatch = useDispatch();
     const history = useHistory();
+    const cartIndex = useSelector(state => state.reducer.cartIndex);
 
     function handleClick() {
-        dispatch(addToCart);
-        history.push("/");
+        if (cartIndex !== undefined) {
+            dispatch(updateCartItem(cartIndex));
+            history.push("/cart");
+        } else {
+            dispatch(addToCart);
+            history.push("/");
+        }
     }
 
     return (
@@ -44,7 +50,7 @@ export default function ItemContainer() {
                     </Switch>
                 </Grid>
                 <Grid item container justify="flex-end">
-                    <Button variant="contained" color="primary" onClick={handleClick}>Add to Cart</Button>
+                    <Button variant="contained" color="primary" onClick={handleClick}>{cartIndex !== undefined ? "Update Item" : "Add to Cart"}</Button>
                 </Grid>
             </Grid>
         </Grid>
