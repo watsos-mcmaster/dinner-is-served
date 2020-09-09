@@ -1,6 +1,6 @@
 import React from 'react';
 import { Switch, Route, useHistory } from 'react-router-dom';
-import { Grid, Typography, Button } from '@material-ui/core';
+import { Grid, Typography, Button, useTheme, useMediaQuery } from '@material-ui/core';
 import SaladItem from './Items/SaladItem';
 import SmoothieItem from './Items/SmoothieItem';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,6 +18,8 @@ export default function ItemContainer() {
     const dispatch = useDispatch();
     const history = useHistory();
     const cartIndex = useSelector(state => state.reducer.cartIndex);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     function handleClick() {
         if (cartIndex !== undefined) {
@@ -32,9 +34,9 @@ export default function ItemContainer() {
     return (
         <Grid container direction="column" spacing={2}>
             <Grid item>
-                <Typography variant="h3" color="primary">Customize your meal!</Typography>
+                <Typography variant={isMobile ? "h5" : "h4"} color="primary">Customize your meal!</Typography>
             </Grid>
-            <Grid container item xs={8} spacing={2}>
+            <Grid container item md={8} xs={12} spacing={2}>
                 <Grid item>
                     <Switch>
                         <Route path="/item/salad" component={SaladItem}/>

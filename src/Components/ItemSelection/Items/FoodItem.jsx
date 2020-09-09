@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Grid, FormGroup, Checkbox, FormControl, FormControlLabel, Typography, RadioGroup, Radio } from '@material-ui/core'
+import { Grid, FormGroup, Checkbox, FormControl, FormControlLabel, Typography, RadioGroup, Radio, useTheme, useMediaQuery, Divider } from '@material-ui/core'
 import { useDispatch, useSelector } from 'react-redux';
 import { OutlinedDiv } from '../../Styles';
 import * as Actions from '../../../redux/actions';
@@ -7,6 +7,8 @@ import * as Actions from '../../../redux/actions';
 export default function FoodItem({itemName, price, options}) {
     const dispatch = useDispatch();
     const currentOptions = useSelector(state => state.reducer.currentItem.options);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     React.useEffect(() => {
         if (currentOptions.length === 0) {
@@ -26,10 +28,10 @@ export default function FoodItem({itemName, price, options}) {
     return (
         <OutlinedDiv>
             <Grid item container justify="space-between">
-                <Grid item xs={6}>
-                    <Typography variant="h5">{`Options for building your ${itemName.toLowerCase()}:`}</Typography>
+                <Grid item xs={9}>
+                    <Typography variant={isMobile ? "h6" : "h5"} style={{paddingBottom: "15px"}}>{`Options for building your ${itemName.toLowerCase()}:`}</Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={3}>
                     <Typography variant="h5" color="textSecondary" align="right">${price}</Typography>
                 </Grid>
                 {options.map((item, i) => {
@@ -44,6 +46,9 @@ export default function FoodItem({itemName, price, options}) {
                                 </FormGroup>
                                 : <SingleGroup items={item.options} currentOptions={currentOptions}/>}
                             </FormControl>
+                            {isMobile && (i < options.length - 1) && 
+                                <Divider/>
+                            }
                         </Grid>
                     )
                 })}
@@ -52,7 +57,7 @@ export default function FoodItem({itemName, price, options}) {
     );
 }
 
-function SingleGroup({items, currentOptions}) {
+function SingleGroup({items, currentOptions, start, end}) {
     const dispatch = useDispatch();
     const selectedOption = currentOptions.map(option => items.indexOf(option)).find(index => index > -1);
     const [value, setValue] = useState(selectedOption ? items[selectedOption] : items[0]);
@@ -75,7 +80,7 @@ function SingleGroup({items, currentOptions}) {
                 return <FormControlLabel control={<Radio/>} value={option} label={option} key={i}/>
             })}
         </RadioGroup>
-    )
+    );
 }
 
 function SelectableItem({name, handleChange, currentOptions}) {
@@ -84,5 +89,5 @@ function SelectableItem({name, handleChange, currentOptions}) {
             control={<Checkbox color="primary" checked={currentOptions.indexOf(name) > -1} onChange={handleChange} name={name} />}
             label={name}
         />
-    )
+    );
 }

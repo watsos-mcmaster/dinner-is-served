@@ -1,21 +1,23 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { Grid, Paper, Typography, List, ListItem, Button, makeStyles } from '@material-ui/core';
+import { Grid, Paper, Typography, List, ListItem, Button, makeStyles, useTheme, useMediaQuery } from '@material-ui/core';
 import HighlightOffOutlinedIcon from '@material-ui/icons/HighlightOffOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import { removeFromCart, completePurchase, setCurrentItem, setCartIndex } from '../../redux/actions';
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
+  paper: props => ({
     padding: theme.spacing(2),
     margin: 'auto',
-    width: '50vw',
-  },
+    width: props.isMobile ? '70vw' : '50vw',
+  }),
 }));
 
 export default function ShoppingCart() {
-  const classes = useStyles();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const classes = useStyles({isMobile});
   const dispatch = useDispatch();
   const items = useSelector(state => state.reducer.cart);
   const history = useHistory();
@@ -46,10 +48,10 @@ export default function ShoppingCart() {
         return (
           <Grid item key={i}>
             <Paper className={classes.paper}>
-              <Grid container spacing={2} alignItems="center" justify="space-between">
-                <Grid item>
-                  <Typography variant="h4" style={{ fontWeight: 600 }}>{item.name}</Typography>
-                  <Typography variant="h5" color="textSecondary">${item.price}</Typography>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item container justify="space-between">
+                  <Typography variant="h4" style={{ fontWeight: 600 }} display="inline">{item.name}</Typography>
+                  <Typography variant="h5" color="textSecondary" display="inline">${item.price}</Typography>
                 </Grid>
                 <Grid item>
                   <Typography variant="h6" className={classes.title}>
@@ -66,7 +68,7 @@ export default function ShoppingCart() {
                     })}
                   </List>
                 </Grid>
-                <Grid item container xs={4} spacing={2}>
+                <Grid item container md={4} xs={12} spacing={2} justify="center">
                   <Grid item xs={12}>
                     <Button variant="contained" color="primary" onClick={() => handleEdit(i)} startIcon={<EditOutlinedIcon/>} fullWidth> Edit Item</Button>
                   </Grid>
@@ -80,10 +82,10 @@ export default function ShoppingCart() {
         )
       })}
       <Grid container direction="column" alignItems="flex-end">
-        <Grid item xs={4}>
+        <Grid item xs>
           <Typography variant="h5">Total price: ${sumPrices()}</Typography>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs>
           <Button variant="contained" color="primary" disabled={items.length===0} onClick={handleFinalize}>Finalize Purchase</Button>
         </Grid>
       </Grid>

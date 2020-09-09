@@ -11,6 +11,6 @@ export const OutlinedDiv = styled.div`
 `
 
 export const ClickablePaper = styled(Paper)`
-  width: 100%;
+  width: 190px;
   cursor: pointer;
 `
